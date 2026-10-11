@@ -6,7 +6,7 @@
 
 ## Context
 
-The stable version of your application (`app-stable`, running `nginx:1.24` with 4 replicas) is serving production traffic through the `my-app-svc` Service. A new version (`nginx:1.25`) has passed integration testing, but before a full rollout, the team wants to validate it with real production traffic. You need to deploy a canary that receives approximately 20% of traffic alongside the stable version. The existing Service must not be modified — both deployments need to be routable through it.
+The stable version of your application (`app-stable`, running `nginx:1.24` with 4 replicas) is serving production traffic through the `my-app-svc` Service. A new version (`nginx:1.25`) has passed integration testing. Before a full rollout, the team wants to validate it with real production traffic. You need to deploy a canary that receives about 20% of traffic alongside the stable version. Do not modify the existing Service; both deployments must be routable through it.
 
 ## Setup
 

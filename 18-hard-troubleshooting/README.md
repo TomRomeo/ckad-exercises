@@ -17,13 +17,13 @@ Run the setup script to create the namespace and deploy the broken resources:
 ```
 
 The following resources are deployed (all with issues):
-- **Deployment `web-deploy`** — pods are crashing
-- **Service `web-svc`** — not routing traffic to the correct pods
-- **ConfigMap `app-conf`** — contains database configuration
+- **Deployment `web-deploy`**: pods are crashing
+- **Service `web-svc`**: not routing traffic to the correct pods
+- **ConfigMap `app-conf`**: contains database configuration
 
 ## Tasks
 
-1. The `web-deploy` Deployment pods are crash-looping. The application should start with its default entrypoint — investigate what is overriding it and fix the Deployment so pods run properly.
+1. The `web-deploy` Deployment pods are crash-looping. The application should start with its default entrypoint. Investigate what is overriding it and fix the Deployment so pods run properly.
 2. The Service `web-svc` is supposed to route traffic to the `web-deploy` pods, but has no endpoints. Investigate why the Service cannot discover the Deployment's pods and fix it.
 3. A ConfigMap named `app-conf` exists with database connection details. Create a new pod named `debug-pod` (image `busybox:1.36`, command `sleep 3600`) that loads all values from this ConfigMap as environment variables. Verify the pod has the expected `DB_HOST` and `DB_PORT` variables.
 
@@ -31,7 +31,7 @@ The following resources are deployed (all with issues):
 
 <details>
 <summary>Hint 1</summary>
-Check pod status and events: `kubectl describe pod -l app=web -n ckad-troubleshoot`. Look at the container command — is it a valid nginx command?
+Check pod status and events: `kubectl describe pod -l app=web -n ckad-troubleshoot`. Look at the container command. Is it a valid nginx command?
 </details>
 
 <details>

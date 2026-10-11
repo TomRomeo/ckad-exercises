@@ -6,7 +6,7 @@
 
 ## Context
 
-Three application tiers are running in the `ckad-netpol` namespace: a web frontend (`app=web`), an API layer (`app=api`), and a database (`app=db`). The security team requires that the database pods are only accessible from the API layer — no other pods (including the frontend) should be able to connect to the database directly.
+Three application tiers are running in the `ckad-netpol` namespace: a web frontend (`app=web`), an API layer (`app=api`), and a database (`app=db`). The security team requires that the database pods are only reachable from the API layer. No other pods, including the frontend, should be able to connect to the database directly.
 
 Create a NetworkPolicy named `db-policy` that restricts incoming traffic to the database pods so only the API pods can reach them on port 80. Outbound traffic from the database should not be restricted.
 

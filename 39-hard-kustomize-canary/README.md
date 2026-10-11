@@ -23,8 +23,8 @@ This creates the namespace `ckad-kustomize` and writes a Kustomize base to `/tmp
 Edit the Kustomize configuration under `/tmp/ckad-kustomize/` and apply it so that the **total** number of pods (`web-main` + `web-canary`) is **10**, with **20%** of traffic going to the canary.
 
 - Total pods: `10`
-- Canary share: `20%` → `web-canary` runs `2` pods, `web-main` runs `8` pods
-- Change only the Deployment replica counts — do **not** modify the Service
+- Canary share: `20%`, so `web-canary` runs `2` pods and `web-main` runs `8` pods
+- Change only the Deployment replica counts. Do **not** modify the Service
 - Apply with `kubectl apply -k /tmp/ckad-kustomize/`
 
 ## Hints

@@ -6,7 +6,7 @@
 
 ## Context
 
-Your team is deploying an application that has a potentially slow initialization phase — it may take up to 60 seconds to become ready on cold starts (loading caches, running migrations, etc.). Without special handling, Kubernetes may kill the container before it finishes starting up, mistaking slow startup for a crash. The application also needs ongoing health monitoring once it is running.
+Your team is deploying an application with a slow initialization phase. On a cold start it may take up to 60 seconds to become ready (loading caches, running migrations, and so on). Without special handling, Kubernetes may kill the container before it finishes starting, mistaking slow startup for a crash. The application also needs ongoing health monitoring once it is running.
 
 ## Setup
 
@@ -19,7 +19,7 @@ Run the setup script to create the namespace:
 ## Tasks
 
 1. Deploy a pod named `slow-start-pod` in the `ckad-startup` namespace using image `nginx:1.25` with the container named `app`.
-2. Configure the pod with comprehensive health checking for all three lifecycle phases:
+2. Configure health checking for all three lifecycle phases:
    - **Startup**: The application may take up to 60 seconds to become ready. Check the root path on port `80` every 2 seconds during startup, allowing enough consecutive failures to cover the full 60-second window.
    - **Liveness**: Once started, verify the application is still alive by checking the same HTTP endpoint every 10 seconds. If it becomes unresponsive, restart it.
    - **Readiness**: Check every 5 seconds whether the application is ready to accept traffic on its HTTP endpoint (root path, port `80`).

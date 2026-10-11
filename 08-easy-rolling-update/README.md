@@ -6,7 +6,7 @@
 
 ## Context
 
-The `web-app` Deployment is currently running `nginx:1.24` with 4 replicas in production. A new version of the image (`nginx:1.25`) has been tested and approved for release. The operations team requires zero-downtime upgrades for all production services. Additionally, all deployment changes must be traceable — the team needs to see what changed and when in the rollout history.
+The `web-app` Deployment is currently running `nginx:1.24` with 4 replicas in production. A new version of the image (`nginx:1.25`) has been tested and approved for release. The operations team requires zero-downtime upgrades for all production services. Every deployment change must also be traceable, so the team can see what changed and when in the rollout history.
 
 ## Setup
 

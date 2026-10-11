@@ -6,7 +6,7 @@
 
 ## Context
 
-A Deployment named `ready-app` runs 3 replicas behind the Service `ready-svc` in the `ckad-readiness` namespace. The containers accept traffic the moment they start, even before the application is actually able to serve requests — so during a rollout the Service briefly sends traffic to pods that are not ready yet, and some requests fail. The team wants the Service to route traffic only to pods that have confirmed they can serve.
+A Deployment named `ready-app` runs 3 replicas behind the Service `ready-svc` in the `ckad-readiness` namespace. The containers accept traffic the moment they start, even before the application can actually serve requests. During a rollout the Service then briefly sends traffic to pods that are not ready yet, and some requests fail. The team wants the Service to route traffic only to pods that have confirmed they can serve.
 
 ## Setup
 

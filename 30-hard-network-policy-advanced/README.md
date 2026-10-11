@@ -8,7 +8,7 @@
 
 Your namespace `ckad-netpol-adv` runs a three-tier application: a frontend (`tier=web`), a backend API (`tier=api`, port 8080), and a database (`tier=data`, port 5432). A monitoring pod in the separate namespace `ckad-netpol-external` also needs access to the backend.
 
-Implement a comprehensive network security posture with the following policies:
+Implement a layered network security posture with the following policies:
 
 **Note:** Network Policies require a CNI plugin that supports them (e.g., Calico, Cilium). The policies will be created but may not be enforced without a compatible CNI.
 
@@ -22,7 +22,7 @@ Implement a comprehensive network security posture with the following policies:
 
 1. **Backend protection** (`backend-policy`): The API layer should only accept incoming connections on port 8080 from two sources: frontend pods in the same namespace, and any pod from the `ckad-netpol-external` namespace. All other inbound traffic to the API must be denied.
 
-2. **Database lockdown** (`database-policy`): The database is the most sensitive tier. It should only accept incoming connections on port 5432 from the API pods in the same namespace. For outbound traffic, the database should only be allowed to make DNS lookups (UDP port 53) — all other egress must be blocked.
+2. **Database lockdown** (`database-policy`): The database is the most sensitive tier. It should only accept incoming connections on port 5432 from the API pods in the same namespace. For outbound traffic, the database should only be allowed to make DNS lookups (UDP port 53); all other egress must be blocked.
 
 3. **Default deny** (`default-deny-ingress`): As a baseline, all pods in the namespace should deny inbound traffic by default. The specific allow rules above take precedence for the pods they target.
 

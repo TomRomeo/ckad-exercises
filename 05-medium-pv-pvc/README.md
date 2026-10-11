@@ -6,7 +6,7 @@
 
 ## Context
 
-Your application needs persistent storage that survives pod restarts. The infrastructure team has allocated a host directory at `/tmp/ckad-data` on the node for this purpose. You need to provision storage from this directory, claim a portion of it for your application, and mount it into a pod. The storage should use a manual provisioning workflow — no dynamic storage provisioner is available in this cluster.
+Your application needs persistent storage that survives pod restarts. The infrastructure team has allocated a host directory at `/tmp/ckad-data` on the node for this purpose. You need to provision storage from this directory, claim a portion of it for your application, and mount it into a pod. The storage uses manual provisioning, since this cluster has no dynamic storage provisioner.
 
 ## Tasks
 

@@ -17,7 +17,7 @@ A colleague accidentally deployed a broken image to the `rollback-app` Deploymen
 This creates a Deployment `rollback-app` and applies two updates:
 - Revision 1: `nginx:1.23` (initial)
 - Revision 2: `nginx:1.24` (working)
-- Revision 3: `nginx:1.25-nonexistent` (broken — image pull error)
+- Revision 3: `nginx:1.25-nonexistent` (broken, image pull error)
 
 ## Tasks
 

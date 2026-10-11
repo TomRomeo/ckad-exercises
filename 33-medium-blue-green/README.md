@@ -6,7 +6,7 @@
 
 ## Context
 
-In the `ckad-bluegreen` namespace, the web team runs two versions of a web app as Deployments `web-blue` and `web-green`. The Service `web-svc` currently load-balances across **both** versions. The team wants to ship a new image to the green version, but then — following a blue-green strategy — cut all live traffic back to the blue version in a single, instant switch.
+In the `ckad-bluegreen` namespace, the web team runs two versions of a web app as Deployments `web-blue` and `web-green`. The Service `web-svc` currently load-balances across **both** versions. The team wants to ship a new image to the green version, then cut all live traffic back to the blue version in a single switch, following a blue-green strategy.
 
 ## Setup
 
@@ -15,9 +15,9 @@ In the `ckad-bluegreen` namespace, the web team runs two versions of a web app a
 ```
 
 This creates:
-- Deployment `web-blue` — pods labelled `app=web, version=blue`
-- Deployment `web-green` — pods labelled `app=web, version=green`, image `nginx:1.30-alpine`
-- Service `web-svc` — selector `app=web` (matches both Deployments)
+- Deployment `web-blue`, with pods labelled `app=web, version=blue`
+- Deployment `web-green`, with pods labelled `app=web, version=green`, image `nginx:1.30-alpine`
+- Service `web-svc`, with selector `app=web` (matches both Deployments)
 
 ## Tasks
 

@@ -6,13 +6,13 @@
 
 ## Context
 
-A developer ServiceAccount `dev-user` has been created in the `ckad-rbac` namespace by the setup script. The security team needs to grant this account specific permissions following the principle of least privilege — only the access required for the developer's workflow, nothing more.
+A developer ServiceAccount `dev-user` has been created in the `ckad-rbac` namespace by the setup script. The security team needs to grant this account specific permissions following the principle of least privilege: only the access required for the developer's workflow, nothing more.
 
 ## Tasks
 
-1. The developer needs **read-only access to pods** — they should be able to view pods and their logs, but not modify or delete them. Create a Role named `pod-reader` that grants this access, and bind it to `dev-user` with a RoleBinding named `dev-user-pod-reader`.
+1. The developer needs **read-only access to pods**: they should be able to view pods and their logs, but not modify or delete them. Create a Role named `pod-reader` that grants this access, and bind it to `dev-user` with a RoleBinding named `dev-user-pod-reader`.
 
-2. The developer also needs **full management access to Deployments** (in the `apps` API group) — they should be able to view, create, update, and delete Deployments. Create a Role named `deploy-manager` that grants this access, and bind it to `dev-user` with a RoleBinding named `dev-user-deploy-manager`.
+2. The developer also needs **full management access to Deployments** (in the `apps` API group): they should be able to view, create, update, and delete Deployments. Create a Role named `deploy-manager` that grants this access, and bind it to `dev-user` with a RoleBinding named `dev-user-deploy-manager`.
 
 3. Verify that `dev-user` can get pods and manage deployments, but cannot delete pods or create services.
 

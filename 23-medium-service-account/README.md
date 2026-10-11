@@ -14,7 +14,7 @@ Your application pod needs a dedicated identity for audit trail purposes, but th
 
 2. Deploy a pod named `sa-pod` (image `nginx:1.25`, container name `app`) in namespace `ckad-sa` running under the `app-sa` identity.
 
-3. For security, ensure the pod does not have Kubernetes API credentials automatically available inside the container — the application does not need them.
+3. For security, ensure the pod does not have Kubernetes API credentials automatically available inside the container, since the application does not need them.
 
 ## Hints
 
