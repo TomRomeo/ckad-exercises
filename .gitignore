@@ -1,1 +1,5 @@
 .DS_STORE
+/tui/ckad-tui
+tui
+!/tui/
+.idea

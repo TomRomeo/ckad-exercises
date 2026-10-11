@@ -27,6 +27,49 @@ cat 01-easy-pod-design/README.md
 ./cleanup.sh
 ```
 
+## Interactive TUI
+
+Prefer a terminal UI over juggling files? Launch the built-in TUI (requires Go):
+
+```bash
+./tui.sh
+```
+
+It discovers all exercises dynamically and lets you:
+
+- Browse the exercise list (filter by typing `/`), with difficulty badges and a
+  `✓ solved` marker once an exercise's `verify.sh` passes.
+- See a **progress bar** (solved / total) and a **session timer** at the top.
+- Read the rendered exercise markdown in a scrollable pane.
+- Jump to the **next/previous** exercise with `]` / `[` without leaving detail view.
+- Reveal hints **one at a time** with `n` (press `N` to hide them again).
+- Run `setup.sh` with `s` and the validation (`verify.sh`) with `v`. Verify
+  output **streams live** (with ANSI colors preserved, running under a PTY)
+  directly below the exercise markdown in the same scrollable pane.
+- Enable **live verify** with `w`: it re-runs `verify.sh` quietly in the
+  background every few seconds and updates the solved status automatically,
+  so you can keep editing and watch it flip to passing.
+- 🎉 **Confetti** rains down whenever an exercise first turns green (from either
+  a manual `v` run or live verify).
+
+Keys:
+
+| Key | Action |
+|-----|--------|
+| `enter` | open exercise |
+| `n` / `N` | reveal next hint / hide all hints |
+| `v` | run `verify.sh` (live streaming output) |
+| `w` | toggle live verify (auto re-run in background) |
+| `s` | run `setup.sh` |
+| `]` / `[` | next / previous exercise |
+| `t` / `T` | start-pause timer / reset timer |
+| `↑` `↓` | scroll |
+| `esc` | back to list |
+| `q` | quit |
+
+
+
+
 ## Exercise Overview
 
 ### Domain 1: Application Design and Build (20%)
