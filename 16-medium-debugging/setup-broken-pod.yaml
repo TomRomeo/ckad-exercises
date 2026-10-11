@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken-pod
+  namespace: ckad-debug
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.25broken

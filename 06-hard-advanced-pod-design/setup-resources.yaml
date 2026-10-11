@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: ckad-adv-pod
+data:
+  config.json: '{"logLevel":"info","port":8080}'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: ckad-adv-pod
+data:
+  api-key: c2VjcmV0LWtleS0xMjM=
