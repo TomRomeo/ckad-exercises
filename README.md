@@ -39,33 +39,42 @@ It discovers all exercises dynamically and lets you:
 
 - Browse the exercise list (filter by typing `/`), with difficulty badges and a
   `✓ solved` marker once an exercise's `verify.sh` passes.
-- See a **progress bar** (solved / total) and a **session timer** at the top.
+- See a **progress bar** (solved / total) and a **global session timer** at the
+  top. The timer starts automatically and runs across every exercise; pause or
+  reset it from the exercise list.
 - Read the rendered exercise markdown in a scrollable pane.
 - Jump to the **next/previous** exercise with `]` / `[` without leaving detail view.
 - Reveal hints **one at a time** with `n` (press `N` to hide them again).
 - Run `setup.sh` with `s` and the validation (`verify.sh`) with `v`. Verify
-  output **streams live** (with ANSI colors preserved, running under a PTY)
+  output **streams live** (with ANSI colors preserved — it runs under a PTY)
   directly below the exercise markdown in the same scrollable pane.
+- Watch a **per-check progress bar** (`■■□□□ 2/5 checks`) fill in as each
+  `verify.sh` check reports PASS/FAIL.
+- See a **cluster preflight banner** (`⎈ <context> ● reachable`) so you know
+  kubectl is connected before you blame your YAML (auto-refreshes; `r` on the
+  list to re-check).
 - Enable **live verify** with `w`: it re-runs `verify.sh` quietly in the
-  background every few seconds and updates the solved status automatically,
+  background about once a second and updates the solved status automatically,
   so you can keep editing and watch it flip to passing.
 - 🎉 **Confetti** rains down whenever an exercise first turns green (from either
   a manual `v` run or live verify).
 
-Keys:
+Keys (exercise view):
 
 | Key | Action |
 |-----|--------|
 | `enter` | open exercise |
 | `n` / `N` | reveal next hint / hide all hints |
-| `v` | run `verify.sh` (live streaming output) |
+| `v` | run `verify.sh` (live streaming output + per-check progress) |
 | `w` | toggle live verify (auto re-run in background) |
 | `s` | run `setup.sh` |
 | `]` / `[` | next / previous exercise |
-| `t` / `T` | start-pause timer / reset timer |
 | `↑` `↓` | scroll |
 | `esc` | back to list |
 | `q` | quit |
+
+On the exercise **list**: `t` / `T` pause-resume / reset the timer, and `r`
+re-checks cluster connectivity.
 
 
 

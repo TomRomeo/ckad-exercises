@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -62,6 +64,7 @@ type watchTickMsg struct{ idx int }
 type watchResultMsg struct {
 	idx    int
 	passed bool
+	output []string
 }
 
 // streamMsg carries one line of live script output, or (done=true) the final
@@ -82,6 +85,20 @@ type setupDoneMsg struct {
 	output string
 	err    error
 }
+
+// checkStatus is the state of a single verify.sh check.
+type checkStatus uint8
+
+const (
+	checkPending checkStatus = iota
+	checkPass
+	checkFail
+)
+
+var (
+	ansiRe  = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+	checkRe = regexp.MustCompile(`(?i)check\s+(\d+)\s*/\s*(\d+).*?:\s*\**\s*(pass|fail)`)
+)
 
 // ---- styles ----
 
@@ -139,6 +156,16 @@ type model struct {
 	console []string
 	stream  chan streamMsg
 
+	// per-check progress parsed from streamed verify output
+	checks     []checkStatus
+	checkTotal int
+
+	// cluster preflight
+	clusterKnown     bool
+	kubectlFound     bool
+	clusterCtx       string
+	clusterReachable bool
+
 	lastResult *verifyDoneMsg
 	setupMsg   string
 	passed     map[string]bool
@@ -179,6 +206,10 @@ func newModel(exs []Exercise) model {
 	l.SetFilteringEnabled(true)
 	m.list = l
 	m.rebuildList()
+
+	// Global session timer starts running at launch.
+	m.timerRunning = true
+	m.timerStart = time.Now()
 	return m
 }
 
@@ -190,7 +221,62 @@ func (m *model) rebuildList() {
 	m.list.SetItems(items)
 }
 
-func (m model) Init() tea.Cmd { return tickCmd() }
+// parseCheck inspects a streamed verify line like "Check 3/5 - ...: PASS" and
+// updates the per-check progress state.
+func (m *model) parseCheck(line string) {
+	clean := ansiRe.ReplaceAllString(line, "")
+	mt := checkRe.FindStringSubmatch(clean)
+	if mt == nil {
+		return
+	}
+	cur, _ := strconv.Atoi(mt[1])
+	total, _ := strconv.Atoi(mt[2])
+	if total > m.checkTotal {
+		m.checkTotal = total
+	}
+	for len(m.checks) < total {
+		m.checks = append(m.checks, checkPending)
+	}
+	if cur >= 1 && cur <= len(m.checks) {
+		if strings.EqualFold(mt[3], "pass") {
+			m.checks[cur-1] = checkPass
+		} else {
+			m.checks[cur-1] = checkFail
+		}
+	}
+}
+
+func (m *model) resetChecks() {
+	m.checks = nil
+	m.checkTotal = 0
+}
+
+// checksView renders the per-check progress indicator, e.g. "■■□□□ 2/5 checks".
+func (m model) checksView() string {
+	if m.checkTotal == 0 {
+		return ""
+	}
+	var sb strings.Builder
+	passed := 0
+	for i := 0; i < m.checkTotal; i++ {
+		st := checkPending
+		if i < len(m.checks) {
+			st = m.checks[i]
+		}
+		switch st {
+		case checkPass:
+			sb.WriteString(passStyle.Render("■"))
+			passed++
+		case checkFail:
+			sb.WriteString(failStyle.Render("■"))
+		default:
+			sb.WriteString(helpStyle.Render("□"))
+		}
+	}
+	return sb.String() + " " + helpStyle.Render(fmt.Sprintf("%d/%d checks", passed, m.checkTotal))
+}
+
+func (m model) Init() tea.Cmd { return tea.Batch(tickCmd(), checkClusterCmd()) }
 
 func tickCmd() tea.Cmd {
 	return tea.Tick(time.Second, func(t time.Time) tea.Msg { return tickMsg(t) })
@@ -200,22 +286,35 @@ func confettiTickCmd() tea.Cmd {
 	return tea.Tick(70*time.Millisecond, func(t time.Time) tea.Msg { return confettiTickMsg(t) })
 }
 
-const watchInterval = 5 * time.Second
+const watchInterval = 1 * time.Second
 
 func watchTickCmd(idx int) tea.Cmd {
 	return tea.Tick(watchInterval, func(time.Time) tea.Msg { return watchTickMsg{idx: idx} })
 }
 
 // runWatch runs a verify script quietly in the background (no live streaming)
-// and reports only pass/fail, for the live-verify watch loop.
+// and reports pass/fail along with its captured output, for the live-verify
+// watch loop.
 func runWatch(path string, idx int) tea.Cmd {
 	return func() tea.Msg {
 		cmd := exec.Command("bash", path)
 		cmd.Dir = dirOf(path)
 		cmd.Env = os.Environ()
-		err := cmd.Run()
-		return watchResultMsg{idx: idx, passed: err == nil}
+		out, err := cmd.CombinedOutput()
+		return watchResultMsg{idx: idx, passed: err == nil, output: splitLines(out)}
 	}
+}
+
+func splitLines(b []byte) []string {
+	s := strings.TrimRight(string(b), "\n")
+	if s == "" {
+		return nil
+	}
+	lines := strings.Split(s, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimRight(lines[i], "\r")
+	}
+	return lines
 }
 
 // markPassed records a solved exercise and returns true if this is a new pass.
@@ -318,7 +417,7 @@ func (m model) consoleBlock() string {
 	if len(m.console) == 0 {
 		b.WriteString(runStyle.Render("running…"))
 	} else {
-		b.WriteString(strings.Join(m.console, "\n"))
+		b.WriteString(colorizeConsole(m.console))
 		if m.running {
 			b.WriteString("\n" + runStyle.Render("…"))
 		}
@@ -351,6 +450,7 @@ func (m *model) openExercise(idx int) {
 	m.lastResult = nil
 	m.setupMsg = ""
 	m.console = nil
+	m.resetChecks()
 	m.vp.GotoTop()
 	m.refreshViewport()
 }
@@ -388,6 +488,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tickMsg:
 		return m, tickCmd()
 
+	case clusterMsg:
+		m.clusterKnown = true
+		m.kubectlFound = msg.found
+		m.clusterCtx = msg.context
+		m.clusterReachable = msg.reachable
+		return m, clusterTickCmd()
+
+	case clusterTickMsg:
+		return m, checkClusterCmd()
+
 	case confettiTickMsg:
 		if m.confetti.active {
 			m.confetti.update()
@@ -412,9 +522,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.watchResultOK = msg.passed
 		newly := m.markPassed(msg.idx, msg.passed)
 		var cmds []tea.Cmd
-		if newly && msg.idx == m.current && m.screen == screenDetail {
-			if c := m.celebrate(); c != nil {
-				cmds = append(cmds, c)
+		if msg.idx == m.current && m.screen == screenDetail {
+			// Surface the verification output the moment watch sees it pass
+			// (and only on the fail→pass transition, so we don't fight scroll).
+			if msg.passed && !m.running && (m.lastResult == nil || !m.lastResult.passed) {
+				m.console = msg.output
+				m.resetChecks()
+				for _, l := range msg.output {
+					m.parseCheck(l)
+				}
+				r := verifyDoneMsg{passed: true, exitCode: 0}
+				m.lastResult = &r
+				m.refreshViewport()
+				m.vp.GotoBottom()
+			}
+			if newly {
+				if c := m.celebrate(); c != nil {
+					cmds = append(cmds, c)
+				}
 			}
 		}
 		if m.watchIdx == msg.idx {
@@ -440,6 +565,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.console = append(m.console, msg.line)
+		m.parseCheck(msg.line)
 		if m.screen == screenDetail {
 			m.refreshViewport()
 			m.vp.GotoBottom()
@@ -488,6 +614,9 @@ func (m model) updateList(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "q", "ctrl+c":
 		return m, tea.Quit
+	case "r":
+		m.clusterKnown = false
+		return m, checkClusterCmd()
 	case "t":
 		m.toggleTimer()
 		return m, nil
@@ -537,12 +666,6 @@ func (m model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.refreshViewport()
 		}
 		return m, nil
-	case "t":
-		m.toggleTimer()
-		return m, nil
-	case "T":
-		m.resetTimer()
-		return m, nil
 	case "w":
 		ex := m.exercises[m.current]
 		if ex.VerifyPath == "" {
@@ -562,6 +685,7 @@ func (m model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.running = true
 		m.lastResult = nil
 		m.console = nil
+		m.resetChecks()
 		m.stream = make(chan streamMsg, 1024)
 		startScript(ex.VerifyPath, m.stream)
 		m.refreshViewport()
@@ -671,8 +795,8 @@ func (m model) progressLine() string {
 	}
 	bar := m.progress.ViewAs(pct)
 	label := fmt.Sprintf(" %d/%d solved", done, total)
-	timer := m.timerView()
-	return lipgloss.JoinHorizontal(lipgloss.Center, bar, helpStyle.Render(label), "  ", timer)
+	left := lipgloss.JoinHorizontal(lipgloss.Center, bar, helpStyle.Render(label), "  ", m.timerView())
+	return lipgloss.JoinHorizontal(lipgloss.Center, left, "   ", m.clusterView())
 }
 
 func (m model) timerView() string {
@@ -717,6 +841,9 @@ func (m model) detailFooter(ex Exercise) string {
 	}
 
 	segs := []string{status, m.timerView()}
+	if cv := m.checksView(); cv != "" {
+		segs = append(segs, cv)
+	}
 	if m.watchIdx == m.current {
 		w := watchStyle.Render(fmt.Sprintf("👁 watch %s", fmtDur(watchInterval)))
 		if m.watchHasRes && m.watchResIdx == m.current {
@@ -728,13 +855,14 @@ func (m model) detailFooter(ex Exercise) string {
 		}
 		segs = append(segs, w)
 	}
+	segs = append(segs, m.clusterView())
 	statusLine := strings.Join(segs, "   ")
 
 	keys := []string{"n hint", "v verify", "w watch"}
 	if ex.SetupPath != "" {
 		keys = append(keys, "s setup")
 	}
-	keys = append(keys, "[ ] prev·next", "t timer", "esc back", "q quit")
+	keys = append(keys, "[ ] prev·next", "esc back", "q quit")
 	help := helpStyle.Render(strings.Join(keys, "  ·  "))
 
 	return lipgloss.JoinVertical(lipgloss.Left, statusLine, help)

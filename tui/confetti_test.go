@@ -20,7 +20,7 @@ func TestConfettiLifecycle(t *testing.T) {
 	if got := strings.Count(out, "\n") + 1; got != 24 {
 		t.Errorf("expected 24 rendered lines, got %d", got)
 	}
-	if !strings.Contains(out, "ALL CHECKS PASSED") {
+	if !strings.Contains(stripANSI(out), "ALL CHECKS PASSED") {
 		t.Error("banner missing from confetti frame")
 	}
 
