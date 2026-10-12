@@ -297,8 +297,7 @@ func watchTickCmd(idx int) tea.Cmd {
 // watch loop.
 func runWatch(path string, idx int) tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.Command("bash", path)
-		cmd.Dir = dirOf(path)
+		cmd := scriptCommand(path)
 		cmd.Env = os.Environ()
 		out, err := cmd.CombinedOutput()
 		return watchResultMsg{idx: idx, passed: err == nil, output: splitLines(out)}
@@ -706,13 +705,42 @@ func (m model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// scriptCommand builds a command that runs a script honoring its shebang,
+// exactly like executing it in a terminal. This matters because forcing a bare
+// "bash" would pick up whichever bash is first on PATH (often Homebrew bash 5.x
+// on macOS), which disagrees with the shebang's /bin/bash (3.2) on things like
+// `set -e` combined with `((x++))` — causing scripts to abort early only inside
+// the TUI. Honoring the shebang keeps TUI behavior identical to the terminal.
+func scriptCommand(path string) *exec.Cmd {
+	interp, args := shebang(path)
+	cmd := exec.Command(interp, append(args, path)...)
+	cmd.Dir = dirOf(path)
+	return cmd
+}
+
+// shebang returns the interpreter and its arguments from the file's first line,
+// defaulting to /bin/bash when there is no usable shebang.
+func shebang(path string) (string, []string) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "/bin/bash", nil
+	}
+	defer func() { _ = f.Close() }()
+	line, _ := bufio.NewReader(f).ReadString('\n')
+	line = strings.TrimRight(line, "\r\n")
+	if strings.HasPrefix(line, "#!") {
+		if fields := strings.Fields(line[2:]); len(fields) > 0 {
+			return fields[0], fields[1:]
+		}
+	}
+	return "/bin/bash", nil
+}
+
 // startScript runs a script under a PTY so colored/TTY-aware output is
 // preserved, streaming each line into ch and finishing with a done message.
 func startScript(path string, ch chan streamMsg) {
-	dir := dirOf(path)
 	go func() {
-		cmd := exec.Command("bash", path)
-		cmd.Dir = dir
+		cmd := scriptCommand(path)
 		cmd.Env = append(os.Environ(),
 			"TERM=xterm-256color",
 			"FORCE_COLOR=1",
@@ -750,8 +778,7 @@ func waitForStream(ch chan streamMsg) tea.Cmd {
 
 func runSetup(path string) tea.Cmd {
 	return func() tea.Msg {
-		cmd := exec.Command("bash", path)
-		cmd.Dir = dirOf(path)
+		cmd := scriptCommand(path)
 		cmd.Env = os.Environ()
 		out, err := cmd.CombinedOutput()
 		return setupDoneMsg{output: string(out), err: err}
