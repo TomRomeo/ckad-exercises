@@ -12,7 +12,7 @@ echo ""
 
 # Check 1: Deployment web-deploy pods are Running (not CrashLoopBackOff)
 echo -n "Check 1: Deployment 'web-deploy' pods are Running... "
-RUNNING_PODS=$(kubectl get pods -n "$NS" -l app=web -o jsonpath='{range .items[*]}{.status.phase}{"\n"}{end}' 2>/dev/null | grep -c "Running" || echo "0")
+RUNNING_PODS=$(kubectl get pods -n "$NS" -l app=web -o jsonpath='{range .items[*]}{.status.phase}{"\n"}{end}' 2>/dev/null | grep -c "Running" || true)
 TOTAL_DEPLOY_PODS=$(kubectl get deployment web-deploy -n "$NS" -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
 if [ "$RUNNING_PODS" -ge 1 ] && [ "$RUNNING_PODS" = "$TOTAL_DEPLOY_PODS" ]; then
   echo "PASS ($RUNNING_PODS/$TOTAL_DEPLOY_PODS running)"

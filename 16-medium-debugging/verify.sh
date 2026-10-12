@@ -45,7 +45,7 @@ fi
 
 # Check 4: No pods in ImagePullBackOff/ErrImagePull state
 echo -n "Check 4: No pods in ImagePullBackOff/ErrImagePull state... "
-BAD_PODS=$(kubectl get pods -n "$NS" -o jsonpath='{range .items[*]}{.status.containerStatuses[0].state.waiting.reason}{"\n"}{end}' 2>/dev/null | grep -cE "(ImagePullBackOff|ErrImagePull)" || echo "0")
+BAD_PODS=$(kubectl get pods -n "$NS" -o jsonpath='{range .items[*]}{.status.containerStatuses[0].state.waiting.reason}{"\n"}{end}' 2>/dev/null | grep -cE "(ImagePullBackOff|ErrImagePull)" || true)
 if [ "$BAD_PODS" = "0" ]; then
   echo "PASS"
   PASS=$((PASS + 1))

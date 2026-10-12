@@ -33,7 +33,7 @@ fi
 # Check 3: All 4 pods running nginx:1.25
 echo -n "3. All 4 pods running nginx:1.25: "
 POD_IMAGES=$(kubectl get pods -n "$NAMESPACE" -l app=web-app -o jsonpath='{.items[*].spec.containers[0].image}' 2>/dev/null || echo "")
-COUNT_125=$(echo "$POD_IMAGES" | tr ' ' '\n' | grep -c "nginx:1.25" || echo "0")
+COUNT_125=$(echo "$POD_IMAGES" | tr ' ' '\n' | grep -c "nginx:1.25" || true)
 if [ "$COUNT_125" = "4" ]; then
     echo "PASS"
     PASS=$((PASS + 1))
