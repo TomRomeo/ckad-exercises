@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Safety guard: confirm the target cluster before creating/deleting resources.
+source "$(dirname "$0")/../scripts/cluster-guard.sh"
+ckad_confirm_cluster
+
 NS1="ckad-housekeeping1"
 NS2="ckad-housekeeping2"
 COURSE_DIR="/tmp/ckad-housekeeping"

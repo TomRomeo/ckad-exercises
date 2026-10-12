@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Safety guard: confirm the target cluster before creating/deleting resources.
+source "$(dirname "$0")/../scripts/cluster-guard.sh"
+ckad_confirm_cluster
+
 NAMESPACE="ckad-init-container"
 
 echo "=== Setting up Exercise 04: Init Containers ==="
