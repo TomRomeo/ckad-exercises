@@ -13,10 +13,10 @@ echo ""
 echo -n "1. Secret 'db-credentials' exists: "
 if kubectl get secret db-credentials -n "$NAMESPACE" &>/dev/null; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # Check 2: Secret is type Opaque
@@ -24,10 +24,10 @@ echo -n "2. Secret type is Opaque: "
 TYPE=$(kubectl get secret db-credentials -n "$NAMESPACE" -o jsonpath='{.type}' 2>/dev/null || true)
 if [[ "$TYPE" == "Opaque" ]]; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL (got: '$TYPE')"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # Check 3: Secret has username and password keys
@@ -35,10 +35,10 @@ echo -n "3. Secret has 'username' and 'password' keys: "
 KEYS=$(kubectl get secret db-credentials -n "$NAMESPACE" -o jsonpath='{.data}' 2>/dev/null || true)
 if echo "$KEYS" | grep -q '"username"' && echo "$KEYS" | grep -q '"password"'; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL (keys: $KEYS)"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # Check 4: Pod exists and is Running
@@ -46,10 +46,10 @@ echo -n "4. Pod 'secret-pod' exists and is Running: "
 PHASE=$(kubectl get pod secret-pod -n "$NAMESPACE" -o jsonpath='{.status.phase}' 2>/dev/null || true)
 if [[ "$PHASE" == "Running" ]]; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL (phase: '$PHASE')"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # Check 5: Secret is mounted as volume at /etc/secrets
@@ -67,7 +67,7 @@ except: pass
 " 2>/dev/null || true)
 if [[ -z "$SECRET_VOL_NAME" ]]; then
   echo "FAIL (no volume referencing secret 'db-credentials' found)"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 else
   MOUNT_PATH=$(kubectl get pod secret-pod -n "$NAMESPACE" -o json 2>/dev/null | python3 -c "
 import json, sys
@@ -82,10 +82,10 @@ except: pass
 " 2>/dev/null || true)
   if [[ "$MOUNT_PATH" == "/etc/secrets" ]]; then
     echo "PASS"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo "FAIL (mountPath: '${MOUNT_PATH:-not found}' for volume '$SECRET_VOL_NAME')"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
   fi
 fi
 
@@ -93,20 +93,20 @@ fi
 echo -n "6. File /etc/secrets/username exists in container: "
 if kubectl exec secret-pod -n "$NAMESPACE" -- cat /etc/secrets/username &>/dev/null; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 # Check 7: File /etc/secrets/password exists
 echo -n "7. File /etc/secrets/password exists in container: "
 if kubectl exec secret-pod -n "$NAMESPACE" -- cat /etc/secrets/password &>/dev/null; then
   echo "PASS"
-  ((PASS++))
+  PASS=$((PASS + 1))
 else
   echo "FAIL"
-  ((FAIL++))
+  FAIL=$((FAIL + 1))
 fi
 
 echo ""
