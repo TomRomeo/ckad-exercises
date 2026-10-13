@@ -1,6 +1,6 @@
 # CKAD Practice Exercises
 
-30 hands-on exercises covering all 5 CKAD (Certified Kubernetes Application Developer) exam domains, graded automatically just like the real exam.
+40 hands-on exercises covering all 5 CKAD (Certified Kubernetes Application Developer) exam domains, graded automatically just like the real exam. Exercises 31–40 are modelled on realistic exam-simulation scenarios to round out coverage.
 
 ## Prerequisites
 
@@ -84,11 +84,32 @@ cat 01-easy-pod-design/README.md
 | 29 | Ingress | Medium | `ckad-ingress` |
 | 30 | Advanced Network Policies | Hard | `ckad-netpol-adv` |
 
+### Exam-Simulation Set
+
+These exercises round out the set and fill gaps not
+covered above (Jobs, HPA, blue-green, StorageClasses, Kustomize, bulk label ops, etc.).
+
+| # | Exercise | Difficulty | Domain | Namespace |
+|---|----------|-----------|--------|-----------|
+| 31 | Job (Completions & Parallelism) | Easy | Design & Build | `ckad-job` |
+| 32 | Bulk Labels & Annotations by Selector | Easy | Config & Security | `ckad-labels` |
+| 33 | Blue-Green Deployment Cutover | Medium | Deployment | `ckad-bluegreen` |
+| 34 | Fix a Deprecated HPA (+ memory metric) | Medium | Deployment | `ckad-hpa` |
+| 35 | StorageClass & Pending PVC | Medium | Design & Build | `ckad-storageclass` |
+| 36 | Decode a ServiceAccount Token | Medium | Config & Security | `ckad-sa-token` |
+| 37 | Find a Pod by Label & Move It | Medium | Design & Build | `ckad-staging` → `ckad-shop` |
+| 38 | Image Pull Policy & Graceful Termination | Medium | Design & Build | `ckad-pullpolicy` |
+| 39 | Canary Rollout with Kustomize | Hard | Deployment | `ckad-kustomize` |
+| 40 | ConfigMap Housekeeping by Label | Easy | Config & Security | `ckad-housekeeping1/2` |
+
+> Exercises that write output files (34, 35, 36, 40) use paths under `/tmp/` on the machine
+> running `kubectl`, mirroring exam-style "write the answer to a file" tasks.
+
 ## Difficulty Distribution
 
-- **Easy** (10 exercises): Fundamental concepts, single-resource tasks
-- **Medium** (14 exercises): Multi-step tasks, combining resources
-- **Hard** (6 exercises): Complex scenarios, multiple resources, troubleshooting
+- **Easy** (13 exercises): Fundamental concepts, single-resource tasks
+- **Medium** (20 exercises): Multi-step tasks, combining resources
+- **Hard** (7 exercises): Complex scenarios, multiple resources, troubleshooting
 
 ## Scoring
 

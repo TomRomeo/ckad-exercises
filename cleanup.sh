@@ -40,11 +40,27 @@ NAMESPACES=(
     ckad-ingress
     ckad-netpol-adv
     ckad-netpol-external
+    ckad-job
+    ckad-labels
+    ckad-bluegreen
+    ckad-hpa
+    ckad-storageclass
+    ckad-sa-token
+    ckad-staging
+    ckad-shop
+    ckad-pullpolicy
+    ckad-kustomize
+    ckad-housekeeping1
+    ckad-housekeeping2
 )
 
 # Also clean up cluster-scoped resources
 echo "Cleaning up PersistentVolumes..."
 kubectl delete pv ckad-pv 2>/dev/null && echo "  Deleted PV ckad-pv" || echo "  PV ckad-pv not found (OK)"
+
+echo ""
+echo "Cleaning up StorageClasses..."
+kubectl delete storageclass retain-sc 2>/dev/null && echo "  Deleted StorageClass retain-sc" || echo "  StorageClass retain-sc not found (OK)"
 
 echo ""
 echo "Cleaning up namespaces..."
@@ -68,6 +84,9 @@ fi
 echo ""
 echo "Cleaning up temp files..."
 rm -f /tmp/ckad-logs-output.txt 2>/dev/null && echo "  Removed /tmp/ckad-logs-output.txt" || true
+for d in /tmp/ckad-hpa /tmp/ckad-storageclass /tmp/ckad-sa-token /tmp/ckad-kustomize /tmp/ckad-housekeeping; do
+    rm -rf "$d" 2>/dev/null && echo "  Removed $d" || true
+done
 
 echo ""
 echo "============================================"
