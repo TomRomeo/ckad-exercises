@@ -1,6 +1,6 @@
 # CKAD Practice Exercises
 
-40 hands-on exercises covering all 5 CKAD (Certified Kubernetes Application Developer) exam domains, graded automatically just like the real exam. Exercises 31–40 are modelled on realistic exam-simulation scenarios to round out coverage.
+40 hands-on exercises covering all 5 CKAD (Certified Kubernetes Application Developer) exam domains, graded automatically just like the real exam. Exercises 31-40 are modelled on realistic exam-simulation scenarios to round out coverage.
 
 ## Prerequisites
 
@@ -97,7 +97,7 @@ covered above (Jobs, HPA, blue-green, StorageClasses, Kustomize, bulk label ops,
 | 34 | Fix a Deprecated HPA (+ memory metric) | Medium | Deployment | `ckad-hpa` |
 | 35 | StorageClass & Pending PVC | Medium | Design & Build | `ckad-storageclass` |
 | 36 | Decode a ServiceAccount Token | Medium | Config & Security | `ckad-sa-token` |
-| 37 | Find a Pod by Label & Move It | Medium | Design & Build | `ckad-staging` → `ckad-shop` |
+| 37 | Find a Pod by Label & Move It | Medium | Design & Build | `ckad-staging` and `ckad-shop` |
 | 38 | Image Pull Policy & Graceful Termination | Medium | Design & Build | `ckad-pullpolicy` |
 | 39 | Canary Rollout with Kustomize | Hard | Deployment | `ckad-kustomize` |
 | 40 | ConfigMap Housekeeping by Label | Easy | Config & Security | `ckad-housekeeping1/2` |
@@ -118,7 +118,7 @@ The `verify-all.sh` script grades all exercises and reports a percentage score. 
 ## Tips
 
 - Set up exercises individually with `./NN-exercise-name/setup.sh` or all at once with `./setup-all.sh`
-- Each exercise is independent — work on them in any order
+- Each exercise is independent, so work on them in any order
 - Use `kubectl explain <resource>` and the [Kubernetes docs](https://kubernetes.io/docs/) (allowed during the real exam)
 - Practice using `kubectl run`, `kubectl create`, and `--dry-run=client -o yaml` for speed
-- Time yourself — the real exam gives ~2 hours for 15-20 tasks
+- Time yourself. The real exam gives about 2 hours for 15-20 tasks

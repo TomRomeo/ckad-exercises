@@ -33,8 +33,8 @@ Container image pull behaviour is controlled by `spec.template.spec.containers[]
 <details>
 <summary>Hint 2</summary>
 
-- "pull only if not already present" → `imagePullPolicy: IfNotPresent`
-- "never pull" → `imagePullPolicy: Never`
+- "pull only if not already present" means `imagePullPolicy: IfNotPresent`
+- "never pull" means `imagePullPolicy: Never`
 </details>
 
 <details>

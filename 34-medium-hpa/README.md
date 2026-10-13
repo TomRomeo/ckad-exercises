@@ -6,7 +6,7 @@
 
 ## Context
 
-A HorizontalPodAutoscaler manifest was written against an old Kubernetes release and no longer applies on this cluster — its `apiVersion` has been removed from the API server. The platform team wants it modernised and extended to scale on memory as well as CPU before it goes live for the `api-app` Deployment.
+A HorizontalPodAutoscaler manifest was written against an old Kubernetes release and no longer applies on this cluster, because its `apiVersion` has been removed from the API server. The platform team wants it updated and extended to scale on memory as well as CPU before it goes live for the `api-app` Deployment.
 
 ## Setup
 
@@ -22,7 +22,7 @@ Edit `/tmp/ckad-hpa/hpa.yaml` so that it:
 
 1. Uses a current, non-deprecated `apiVersion` (the `autoscaling/v2beta1`/`v2beta2` versions have been removed).
 2. Sets `minReplicas` to `2` and `maxReplicas` to `5`.
-3. Scales on **memory** utilization with a target average of `80`% — **in addition to** the existing CPU metric.
+3. Scales on **memory** utilization with a target average of `80`%, in addition to the existing CPU metric.
 
 Then apply it. The HPA must target the existing `api-app` Deployment and be named `api-app`.
 

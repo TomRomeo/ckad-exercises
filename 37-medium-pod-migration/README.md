@@ -2,11 +2,11 @@
 
 **Difficulty:** Medium
 **Domain:** Application Design and Build
-**Namespace:** `ckad-staging` (source) → `ckad-shop` (target)
+**Namespace:** `ckad-staging` (source) and `ckad-shop` (target)
 
 ## Context
 
-A Pod in namespace `ckad-staging` belongs to the e-commerce system `web-shop`, which is owned by the online-shop team. It ended up in the wrong namespace. The Pod's name is unknown — you have to find it by its labels — and it must be moved to the online-shop team's namespace `ckad-shop`. Recreating the Pod there is perfectly fine.
+A Pod in namespace `ckad-staging` belongs to the e-commerce system `web-shop`, which is owned by the online-shop team. It ended up in the wrong namespace. The Pod's name is unknown, so you have to find it by its labels, then move it to the online-shop team's namespace `ckad-shop`. Recreating the Pod there is fine.
 
 ## Setup
 

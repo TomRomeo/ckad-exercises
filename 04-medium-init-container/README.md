@@ -6,7 +6,7 @@
 
 ## Context
 
-Your application pod depends on a backend service called `init-svc` being available before it can start. If the application starts before the service is reachable, it crashes on boot. To prevent this, the pod must wait until `init-svc` is resolvable via cluster DNS before launching the main application. The service does not yet exist — you will need to create it so the pod can eventually transition to a running state.
+Your application pod depends on a backend service called `init-svc` being available before it can start. If the application starts before the service is reachable, it crashes on boot. To prevent this, the pod must wait until `init-svc` resolves via cluster DNS before launching the main application. The service does not exist yet, so you need to create it before the pod can reach a running state.
 
 ## Tasks
 

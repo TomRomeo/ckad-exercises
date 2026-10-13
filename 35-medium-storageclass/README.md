@@ -6,7 +6,7 @@
 
 ## Context
 
-The storage team needs more storage with a provisioner that retains volumes after a claim is deleted. The provisioner itself will be installed later by another team, so the claim you create will stay `Pending` for now — that is expected. You should still capture the event message that explains why, so operators understand the pending state.
+The storage team needs more storage with a provisioner that retains volumes after a claim is deleted. The provisioner itself will be installed later by another team, so the claim you create will stay `Pending` for now, which is expected. You should still capture the event message that explains why, so operators understand the pending state.
 
 ## Setup
 

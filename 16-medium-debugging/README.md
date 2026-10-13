@@ -31,7 +31,7 @@ Use `kubectl describe pod broken-pod -n ckad-debug` to see events and status det
 
 <details>
 <summary>Hint 2</summary>
-The issue is with the container image. Check the image name in the pod spec — is it a valid, pullable image?
+The issue is with the container image. Check the image name in the pod spec. Is it a valid, pullable image?
 </details>
 
 <details>

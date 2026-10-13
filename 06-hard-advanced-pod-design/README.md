@@ -14,7 +14,7 @@ You are deploying a production application pod that combines several Kubernetes 
 
 2. **Configuration initialization:** Before anything else runs, a one-time setup step (container named `config-init`, image `busybox:1.36`) must copy the configuration file from the ConfigMap's mount location to a shared working directory. The command is: `sh -c 'cp /config/config.json /app-config/config.json'`. It reads from a volume named `config-volume` (mounted at `/config`) that is populated from the `app-config` ConfigMap, and writes to a shared volume named `app-config-volume` (mounted at `/app-config`). This step runs once to completion and does not restart.
 
-3. **Log streaming sidecar:** A container named `logger` (image `busybox:1.36`) must stream the application's access log to stdout using the command: `sh -c 'touch /var/log/app/access.log && tail -f /var/log/app/access.log'`. It shares a volume named `log-volume` (mounted at `/var/log/app`) with the main application. This sidecar must start before the main application and remain running alongside it for the pod's entire lifetime — implement it as a Kubernetes native sidecar container.
+3. **Log streaming sidecar:** A container named `logger` (image `busybox:1.36`) must stream the application's access log to stdout using the command: `sh -c 'touch /var/log/app/access.log && tail -f /var/log/app/access.log'`. It shares a volume named `log-volume` (mounted at `/var/log/app`) with the main application. This sidecar must start before the main application and keep running alongside it for the pod's whole lifetime, so implement it as a Kubernetes native sidecar container.
 
 4. **Main application:** The web server container named `app` runs `nginx:1.25` and serves traffic on port **80**. It needs access to three volumes: the shared log directory `log-volume` at `/var/log/app`, the prepared configuration `app-config-volume` at `/app-config`, and sensitive credentials from the `app-secret` Secret via a volume named `secret-volume` at `/secrets`. To ensure fair cluster scheduling, the container should request **100m** CPU and **128Mi** memory, with upper limits of **200m** CPU and **256Mi** memory.
 
@@ -26,8 +26,8 @@ You are deploying a production application pod that combines several Kubernetes 
 <summary>Hint 1</summary>
 
 The `initContainers` section should contain **two** entries:
-- `config-init` — a regular init container (no `restartPolicy` override, runs to completion)
-- `logger` — a native sidecar (has `restartPolicy: Always`)
+- `config-init`, a regular init container (no `restartPolicy` override, runs to completion)
+- `logger`, a native sidecar (has `restartPolicy: Always`)
 
 Order matters: `config-init` must come before `logger` so the config is copied before the sidecar starts.
 </details>

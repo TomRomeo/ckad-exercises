@@ -6,7 +6,7 @@
 
 ## Context
 
-Your application needs database credentials that must be stored securely — not in plain ConfigMaps. The operations team has requested that these credentials be made available as files inside the application container rather than as environment variables, to reduce the risk of accidental exposure through logs or process listings.
+Your application needs database credentials that must be stored securely, not in plain ConfigMaps. The operations team has asked that these credentials be made available as files inside the application container rather than as environment variables, to reduce the risk of accidental exposure through logs or process listings.
 
 ## Tasks
 
