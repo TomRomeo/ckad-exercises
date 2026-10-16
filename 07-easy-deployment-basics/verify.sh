@@ -43,7 +43,7 @@ fi
 
 # Check 4: 3 pods are Ready
 echo -n "4. 3 pods are Ready: "
-READY_PODS=$(kubectl get pods -n "$NAMESPACE" -l app=webapp --field-selector=status.phase=Running -o jsonpath='{.items[*].status.containerStatuses[0].ready}' 2>/dev/null | tr ' ' '\n' | grep -c "true" || echo "0")
+READY_PODS=$(kubectl get pods -n "$NAMESPACE" -l app=webapp --field-selector=status.phase=Running -o jsonpath='{.items[*].status.containerStatuses[0].ready}' 2>/dev/null | tr ' ' '\n' | grep -c "true" || true)
 if [ "$READY_PODS" = "3" ]; then
     echo "PASS"
     PASS=$((PASS + 1))

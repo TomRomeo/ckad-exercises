@@ -68,7 +68,7 @@ fi
 
 # Check 6: All 3 pods are Ready
 echo -n "Check 6: All 3 pods are Ready... "
-READY_COUNT=$(kubectl get pods -n "$NS" -l app=ready-app -o jsonpath='{range .items[*]}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}' 2>/dev/null | grep -c "True" || echo "0")
+READY_COUNT=$(kubectl get pods -n "$NS" -l app=ready-app -o jsonpath='{range .items[*]}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}' 2>/dev/null | grep -c "True" || true)
 if [ "$READY_COUNT" = "3" ]; then
   echo "PASS"
   PASS=$((PASS + 1))
