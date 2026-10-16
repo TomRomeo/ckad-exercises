@@ -8,6 +8,14 @@
 - `kubectl` configured and connected
 - `helm` (for exercise 11 only)
 
+## Cluster safety check
+
+`setup.sh`, `setup-all.sh`, and `cleanup.sh` create and delete resources, so they
+first check that your current kubectl context is `kind-kind`. On any other context
+they warn you and ask for confirmation before touching the cluster. To run against a
+different cluster, either confirm the prompt or set `CKAD_CLUSTER_CONFIRMED=1`. To
+point the check at a different context name, set `CKAD_EXPECTED_CONTEXT`.
+
 ## Quick Start
 
 ```bash
